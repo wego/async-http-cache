@@ -25,6 +25,7 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   @Inject
   public AsyncHttpCacheServiceImpl(@Assisted AsyncHttpClient asyncHttpClient, @Assisted long ttl) {
     this.asyncHttpClient = asyncHttpClient;
+    this.ttl = ttl;
   }
 
   @Override
