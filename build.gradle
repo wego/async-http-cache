@@ -6,8 +6,34 @@ apply plugin: 'java'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.8'
+}
+
+apply plugin: 'maven'
+
+apply plugin: 'checkstyle'
+
 repositories {
     mavenCentral()
+}
+
+checkstyle {
+    ignoreFailures = false
+    configFile = file("${project.rootDir}/config/checkstyle/google_checks.xml")
+    toolVersion = '7.6'
+    configProperties = ['basedir': "${project.rootDir}/config/checkstyle"]
+}
+
+tasks.withType(Checkstyle).each { checkstyleTask ->
+    checkstyleTask.doLast {
+        reports.all { report ->
+            def outputFile = report.destination
+            if (outputFile.exists() && outputFile.text.contains("<error ")) {
+                throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+            }
+        }
+    }
 }
 
 dependencies {
