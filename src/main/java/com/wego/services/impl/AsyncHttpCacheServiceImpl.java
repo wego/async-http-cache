@@ -8,23 +8,23 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.wego.dao.models.CachedResponse;
-import com.wego.services.AsyncHttpCachedService;
+import com.wego.services.AsyncHttpCacheService;
 import com.wego.services.CachedResponseService;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.util.MurmurHash;
 
-public class AsyncHttpCachedServiceImpl implements AsyncHttpCachedService {
+public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
 
   @Inject private CachedResponseService cachedResponseService;
 
   @Inject private AsyncHttpClient asyncHttpClient;
 
   @Inject
-  public AsyncHttpCachedServiceImpl() {}
+  public AsyncHttpCacheServiceImpl() {}
 
   @Inject
-  public AsyncHttpCachedServiceImpl(@Assisted AsyncHttpClient asyncHttpClient) {
+  public AsyncHttpCacheServiceImpl(@Assisted AsyncHttpClient asyncHttpClient) {
     this.asyncHttpClient = asyncHttpClient;
   }
 

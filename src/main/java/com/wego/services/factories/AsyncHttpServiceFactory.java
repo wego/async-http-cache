@@ -1,10 +1,10 @@
 package com.wego.services.factories;
 
 import com.ning.http.client.AsyncHttpClient;
-import com.wego.services.AsyncHttpCachedService;
+import com.wego.services.AsyncHttpCacheService;
 
 public interface AsyncHttpServiceFactory {
-  AsyncHttpCachedService create();
+  AsyncHttpCacheService create();
 
-  AsyncHttpCachedService create(AsyncHttpClient asyncHttpClient);
+  AsyncHttpCacheService create(AsyncHttpClient asyncHttpClient);
 }

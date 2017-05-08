@@ -21,7 +21,7 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.wego.dao.models.CachedResponse;
 import com.wego.fixtures.RequestFixture;
-import com.wego.services.AsyncHttpCachedService;
+import com.wego.services.AsyncHttpCacheService;
 import com.wego.services.CachedResponseService;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,7 +44,7 @@ public class TestAsyncHttpCachedServiceImpl {
   @Rule public WireMockRule wireMockRule = new WireMockRule(8089);
 
   @InjectMocks
-  private AsyncHttpCachedService asyncHttpCachedService = new AsyncHttpCachedServiceImpl();
+  private AsyncHttpCacheService asyncHttpCacheService = new AsyncHttpCacheServiceImpl();
 
   @Mock private CachedResponseService cachedResponseService;
   @Mock private Request request;
@@ -67,7 +67,7 @@ public class TestAsyncHttpCachedServiceImpl {
           }
         };
 
-    asyncHttpCachedService.executeRequest(request, asyncCompletionHandlerBaseHandler);
+    asyncHttpCacheService.executeRequest(request, asyncCompletionHandlerBaseHandler);
   }
 
   @Test
@@ -102,7 +102,7 @@ public class TestAsyncHttpCachedServiceImpl {
           }
         };
 
-    asyncHttpCachedService.executeRequest(request, asyncCompletionHandlerBaseHandler);
+    asyncHttpCacheService.executeRequest(request, asyncCompletionHandlerBaseHandler);
   }
 
   @Test
@@ -149,7 +149,7 @@ public class TestAsyncHttpCachedServiceImpl {
             "POST", "http://localhost:8089/resources/", "param", "test2");
 
     Method method =
-        AsyncHttpCachedServiceImpl.class.getDeclaredMethod("buildResponseId", Request.class);
+        AsyncHttpCacheServiceImpl.class.getDeclaredMethod("buildResponseId", Request.class);
     method.setAccessible(true);
 
     final List<String> responseIds =
@@ -168,7 +168,7 @@ public class TestAsyncHttpCachedServiceImpl {
             .map(
                 rq -> {
                   try {
-                    return (String) method.invoke(asyncHttpCachedService, rq);
+                    return (String) method.invoke(asyncHttpCacheService, rq);
                   } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                     return null;
@@ -188,7 +188,7 @@ public class TestAsyncHttpCachedServiceImpl {
     Request request2 = RequestFixture.createWithFullParams();
 
     Method method =
-        AsyncHttpCachedServiceImpl.class.getDeclaredMethod("buildResponseId", Request.class);
+        AsyncHttpCacheServiceImpl.class.getDeclaredMethod("buildResponseId", Request.class);
     method.setAccessible(true);
 
     final Set<String> responseIds =
@@ -196,7 +196,7 @@ public class TestAsyncHttpCachedServiceImpl {
             .map(
                 rq -> {
                   try {
-                    return (String) method.invoke(asyncHttpCachedService, rq);
+                    return (String) method.invoke(asyncHttpCacheService, rq);
                   } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                     return null;
