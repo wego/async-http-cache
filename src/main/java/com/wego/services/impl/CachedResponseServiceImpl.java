@@ -17,12 +17,12 @@ public class CachedResponseServiceImpl implements CachedResponseService {
   @Inject private CachedResponseToCachedResponseEntity responseToHttpReponseEntity;
 
   @Override
-  public CachedResponse save(CachedResponse cachedResponse) {
+  public CachedResponse save(CachedResponse cachedResponse, long ttl) {
     if (cachedResponse == null) {
       return null;
     }
 
-    cachedResponseDao.save(responseToHttpReponseEntity.transform(cachedResponse));
+    cachedResponseDao.save(responseToHttpReponseEntity.transform(cachedResponse), ttl);
 
     return cachedResponse;
   }

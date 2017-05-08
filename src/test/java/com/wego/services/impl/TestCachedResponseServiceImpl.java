@@ -3,6 +3,7 @@ package com.wego.services.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
@@ -23,6 +24,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestCachedResponseServiceImpl {
+  private static long CACHING_TTL = 60;
+
   @InjectMocks
   private CachedResponseService cachedResponseService = new CachedResponseServiceImpl();
 
@@ -35,7 +38,7 @@ public class TestCachedResponseServiceImpl {
 
   @Test
   public void save_whenInputObjectIsNull_returnNull() {
-    assertThat(cachedResponseService.save(null)).isNull();
+    assertThat(cachedResponseService.save(null, CACHING_TTL)).isNull();
   }
 
   @Test
@@ -46,14 +49,14 @@ public class TestCachedResponseServiceImpl {
 
     when(cachedResponseToCachedResponseEntity.transform(cachedResponse))
         .thenReturn(cachedResponseEntity);
-    when(cachedResponseDao.save(any(CachedResponseEntity.class)))
+    when(cachedResponseDao.save(any(CachedResponseEntity.class), eq(CACHING_TTL)))
         .thenAnswer(
             invocation -> {
               savedCachedResponses.add(invocation.getArgumentAt(0, CachedResponse.class));
               return cachedResponseEntity;
             });
 
-    assertThat(cachedResponseService.save(cachedResponse)).isEqualTo(cachedResponse);
+    assertThat(cachedResponseService.save(cachedResponse, CACHING_TTL)).isEqualTo(cachedResponse);
     assertThat(savedCachedResponses.size()).isEqualTo(1);
   }
 

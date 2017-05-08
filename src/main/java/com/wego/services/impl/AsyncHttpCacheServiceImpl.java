@@ -20,11 +20,13 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
 
   @Inject private AsyncHttpClient asyncHttpClient;
 
-  @Inject
-  public AsyncHttpCacheServiceImpl() {}
+  private long ttl;
 
   @Inject
-  public AsyncHttpCacheServiceImpl(@Assisted AsyncHttpClient asyncHttpClient) {
+  public AsyncHttpCacheServiceImpl(@Assisted long ttl) {}
+
+  @Inject
+  public AsyncHttpCacheServiceImpl(@Assisted AsyncHttpClient asyncHttpClient, @Assisted long ttl) {
     this.asyncHttpClient = asyncHttpClient;
   }
 
@@ -57,7 +59,7 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
       public Response onCompleted(Response response) throws Exception {
         CachedResponse cachedResponse =
             new CachedResponse.Builder(response).setId(responseId).build();
-        cachedResponseService.save(cachedResponse);
+        cachedResponseService.save(cachedResponse, ttl);
 
         return handler.onCompleted(response);
       }

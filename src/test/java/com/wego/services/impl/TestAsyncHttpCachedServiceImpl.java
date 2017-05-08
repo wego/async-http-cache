@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -41,10 +42,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestAsyncHttpCachedServiceImpl {
+  private static long CACHING_TTL = 60;
   @Rule public WireMockRule wireMockRule = new WireMockRule(8089);
 
   @InjectMocks
-  private AsyncHttpCacheService asyncHttpCacheService = new AsyncHttpCacheServiceImpl();
+  private AsyncHttpCacheService asyncHttpCacheService = new AsyncHttpCacheServiceImpl(CACHING_TTL);
 
   @Mock private CachedResponseService cachedResponseService;
   @Mock private Request request;
@@ -86,7 +88,7 @@ public class TestAsyncHttpCachedServiceImpl {
                     .withBody("This is body")));
 
     when(cachedResponseService.findById(anyString())).thenReturn(Optional.empty());
-    when(cachedResponseService.save(any()))
+    when(cachedResponseService.save(any(), eq(CACHING_TTL)))
         .thenAnswer(
             invocation ->
                 savedCachedResponses.add(invocation.getArgumentAt(0, CachedResponse.class)));

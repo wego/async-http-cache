@@ -22,7 +22,7 @@ public class GuavaCachedResponseImpl implements CachedResponseDao {
           .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
   @Override
-  public CachedResponseEntity save(CachedResponseEntity cachedResponseEntity) {
+  public CachedResponseEntity save(CachedResponseEntity cachedResponseEntity, long ttl) {
     String jsonEntity = null;
     try {
       jsonEntity = OBJECT_MAPPER.writeValueAsString(cachedResponseEntity);
