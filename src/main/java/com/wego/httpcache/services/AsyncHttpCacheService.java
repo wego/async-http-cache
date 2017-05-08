@@ -1,4 +1,4 @@
-package com.wego.services;
+package com.wego.httpcache.services;
 
 import com.ning.http.client.AsyncCompletionHandlerBase;
 import com.ning.http.client.Request;

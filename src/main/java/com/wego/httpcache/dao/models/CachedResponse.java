@@ -1,4 +1,4 @@
-package com.wego.dao.models;
+package com.wego.httpcache.dao.models;
 
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.Response;
@@ -45,11 +45,11 @@ public class CachedResponse implements Response {
     return null;
   }
 
-  public String getResponseBody(String charset) throws IOException {
+  public String getResponseBodyExcerpt(int maxLength) throws IOException {
     return null;
   }
 
-  public String getResponseBodyExcerpt(int maxLength) throws IOException {
+  public String getResponseBody(String charset) throws IOException {
     return null;
   }
 

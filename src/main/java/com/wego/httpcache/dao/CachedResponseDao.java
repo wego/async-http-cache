@@ -1,6 +1,6 @@
-package com.wego.dao;
+package com.wego.httpcache.dao;
 
-import com.wego.dao.entities.CachedResponseEntity;
+import com.wego.httpcache.dao.entities.CachedResponseEntity;
 import java.util.Optional;
 
 public interface CachedResponseDao {

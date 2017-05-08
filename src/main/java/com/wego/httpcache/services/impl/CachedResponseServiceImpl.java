@@ -1,11 +1,11 @@
-package com.wego.services.impl;
+package com.wego.httpcache.services.impl;
 
 import com.google.inject.Inject;
-import com.wego.dao.CachedResponseDao;
-import com.wego.dao.mappers.CachedResponseEntityToCachedResponse;
-import com.wego.dao.mappers.CachedResponseToCachedResponseEntity;
-import com.wego.dao.models.CachedResponse;
-import com.wego.services.CachedResponseService;
+import com.wego.httpcache.dao.CachedResponseDao;
+import com.wego.httpcache.dao.mappers.CachedResponseEntityToCachedResponse;
+import com.wego.httpcache.dao.mappers.CachedResponseToCachedResponseEntity;
+import com.wego.httpcache.dao.models.CachedResponse;
+import com.wego.httpcache.services.CachedResponseService;
 import java.util.Optional;
 
 public class CachedResponseServiceImpl implements CachedResponseService {

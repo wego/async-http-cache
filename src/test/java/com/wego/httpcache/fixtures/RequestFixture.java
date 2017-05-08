@@ -1,4 +1,4 @@
-package com.wego.fixtures;
+package com.wego.httpcache.fixtures;
 
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;

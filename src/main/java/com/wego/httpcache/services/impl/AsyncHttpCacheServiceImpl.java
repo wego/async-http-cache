@@ -1,4 +1,4 @@
-package com.wego.services.impl;
+package com.wego.httpcache.services.impl;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -7,9 +7,9 @@ import com.ning.http.client.AsyncCompletionHandlerBase;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
-import com.wego.dao.models.CachedResponse;
-import com.wego.services.AsyncHttpCacheService;
-import com.wego.services.CachedResponseService;
+import com.wego.httpcache.dao.models.CachedResponse;
+import com.wego.httpcache.services.AsyncHttpCacheService;
+import com.wego.httpcache.services.CachedResponseService;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.util.MurmurHash;

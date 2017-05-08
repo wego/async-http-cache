@@ -1,4 +1,4 @@
-package com.wego.services.impl;
+package com.wego.httpcache.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -7,14 +7,15 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
-import com.wego.dao.CachedResponseDao;
-import com.wego.dao.entities.CachedResponseEntity;
-import com.wego.dao.mappers.CachedResponseEntityToCachedResponse;
-import com.wego.dao.mappers.CachedResponseToCachedResponseEntity;
-import com.wego.dao.models.CachedResponse;
-import com.wego.services.CachedResponseService;
+import com.wego.httpcache.dao.CachedResponseDao;
+import com.wego.httpcache.dao.entities.CachedResponseEntity;
+import com.wego.httpcache.dao.mappers.CachedResponseEntityToCachedResponse;
+import com.wego.httpcache.dao.mappers.CachedResponseToCachedResponseEntity;
+import com.wego.httpcache.dao.models.CachedResponse;
+import com.wego.httpcache.services.CachedResponseService;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +39,7 @@ public class TestCachedResponseServiceImpl {
 
   @Test
   public void save_whenInputObjectIsNull_returnNull() {
-    assertThat(cachedResponseService.save(null, CACHING_TTL)).isNull();
+    Assertions.assertThat(cachedResponseService.save(null, CACHING_TTL)).isNull();
   }
 
   @Test
@@ -56,7 +57,8 @@ public class TestCachedResponseServiceImpl {
               return cachedResponseEntity;
             });
 
-    assertThat(cachedResponseService.save(cachedResponse, CACHING_TTL)).isEqualTo(cachedResponse);
+    Assertions.assertThat(cachedResponseService.save(cachedResponse, CACHING_TTL))
+        .isEqualTo(cachedResponse);
     assertThat(savedCachedResponses.size()).isEqualTo(1);
   }
 
@@ -76,6 +78,6 @@ public class TestCachedResponseServiceImpl {
         .thenReturn(cachedResponse);
     when(cachedResponseDao.findById("ID")).thenReturn(Optional.of(cachedResponseEntity));
 
-    assertThat(cachedResponseService.findById("ID").get()).isEqualTo(cachedResponse);
+    Assertions.assertThat(cachedResponseService.findById("ID").get()).isEqualTo(cachedResponse);
   }
 }

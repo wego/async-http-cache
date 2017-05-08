@@ -1,4 +1,4 @@
-package com.wego.dao.impl.guava;
+package com.wego.httpcache.dao.impl.guava;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.wego.dao.CachedResponseDao;
-import com.wego.dao.entities.CachedResponseEntity;
+import com.wego.httpcache.dao.CachedResponseDao;
+import com.wego.httpcache.dao.entities.CachedResponseEntity;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 

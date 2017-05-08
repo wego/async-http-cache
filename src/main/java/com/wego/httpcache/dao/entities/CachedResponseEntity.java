@@ -1,4 +1,4 @@
-package com.wego.dao.entities;
+package com.wego.httpcache.dao.entities;
 
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.cookie.Cookie;

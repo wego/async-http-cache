@@ -1,4 +1,4 @@
-package com.wego.services.impl;
+package com.wego.httpcache.services.impl;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -20,10 +20,10 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
-import com.wego.dao.models.CachedResponse;
-import com.wego.fixtures.RequestFixture;
-import com.wego.services.AsyncHttpCacheService;
-import com.wego.services.CachedResponseService;
+import com.wego.httpcache.dao.models.CachedResponse;
+import com.wego.httpcache.fixtures.RequestFixture;
+import com.wego.httpcache.services.AsyncHttpCacheService;
+import com.wego.httpcache.services.CachedResponseService;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;

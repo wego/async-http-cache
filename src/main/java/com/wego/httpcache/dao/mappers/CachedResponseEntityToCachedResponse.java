@@ -1,7 +1,7 @@
-package com.wego.dao.mappers;
+package com.wego.httpcache.dao.mappers;
 
-import com.wego.dao.entities.CachedResponseEntity;
-import com.wego.dao.models.CachedResponse;
+import com.wego.httpcache.dao.entities.CachedResponseEntity;
+import com.wego.httpcache.dao.models.CachedResponse;
 
 public class CachedResponseEntityToCachedResponse {
 
