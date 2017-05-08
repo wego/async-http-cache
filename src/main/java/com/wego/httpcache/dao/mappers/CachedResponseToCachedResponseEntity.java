@@ -6,25 +6,20 @@ import java.io.IOException;
 
 public class CachedResponseToCachedResponseEntity {
 
-  public CachedResponseEntity transform(CachedResponse cachedResponse) {
+  public CachedResponseEntity transform(CachedResponse cachedResponse) throws IOException {
     CachedResponseEntity cachedResponseEntity = null;
-    String responseBody = null;
 
-    try {
-      responseBody = cachedResponse.getResponseBody();
-    } catch (IOException e) {
-      e.printStackTrace();
+    if (cachedResponse != null) {
+      cachedResponseEntity =
+          new CachedResponseEntity.Builder()
+              .setId(cachedResponse.getId())
+              .setResponseBody(cachedResponse.getResponseBody())
+              .setCookies(cachedResponse.getCookies())
+              .setHeaders(cachedResponse.getHeaders())
+              .setStatusText(cachedResponse.getStatusText())
+              .setStatusCode(cachedResponse.getStatusCode())
+              .build();
     }
-
-    cachedResponseEntity =
-        new CachedResponseEntity.Builder()
-            .setResponseBody(cachedResponse.getId())
-            .setResponseBody(responseBody)
-            .setCookies(cachedResponse.getCookies())
-            .setHeaders(cachedResponse.getHeaders())
-            .setStatusText(cachedResponse.getStatusText())
-            .setStatusCode(cachedResponse.getStatusCode())
-            .build();
 
     return cachedResponseEntity;
   }
