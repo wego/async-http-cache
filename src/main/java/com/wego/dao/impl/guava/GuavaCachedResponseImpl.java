@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class GuavaCachedResponseImpl implements CachedResponseDao {
-  private static long CACHE_TTL = 30;
-  private static Cache<String, String> CACHE =
+  private static final long CACHE_TTL = 30;
+  private static final Cache<String, String> CACHE =
       CacheBuilder.newBuilder().expireAfterWrite(CACHE_TTL, TimeUnit.MINUTES).build();
 
-  public static final ObjectMapper OBJECT_MAPPER =
+  private static final ObjectMapper OBJECT_MAPPER =
       new ObjectMapper()
           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
           .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
