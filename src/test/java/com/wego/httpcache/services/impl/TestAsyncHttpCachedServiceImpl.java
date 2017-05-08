@@ -45,12 +45,14 @@ public class TestAsyncHttpCachedServiceImpl {
   private static long CACHING_TTL = 60;
   @Rule public WireMockRule wireMockRule = new WireMockRule(8089);
 
+  @Spy private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+
   @InjectMocks
-  private AsyncHttpCacheService asyncHttpCacheService = new AsyncHttpCacheServiceImpl(CACHING_TTL);
+  private AsyncHttpCacheService asyncHttpCacheService =
+      new AsyncHttpCacheServiceImpl(asyncHttpClient, CACHING_TTL);
 
   @Mock private CachedResponseService cachedResponseService;
   @Mock private Request request;
-  @Spy private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
   @Test
   public void executeRequest_whenWasCached_getResponseFromCacheAndCallOnComplete()
