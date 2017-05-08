@@ -1,0 +1,28 @@
+group 'com.wego'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile "com.ning:async-http-client:1.8.17"
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'redis.clients:jedis:2.9.0'
+    compile 'org.apache.commons:commons-collections4:4.1'
+    compile 'com.google.inject.extensions:guice-assistedinject:4.0'
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile "com.fasterxml.jackson.core:jackson-databind:2.7.9"
+
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-core:2.0.5-beta'
+    testCompile "com.github.tomakehurst:wiremock-standalone:2.6.0"
+    testCompile 'org.assertj:assertj-core:3.4.1'
+}
