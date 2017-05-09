@@ -9,6 +9,7 @@ public class CookieFixture {
   }
 
   public static Cookie createWithKeyAndValue(String key, String value) {
-    return new Cookie(key, value, StringUtils.join(key, "=", value), "", "", 1, 2, true, true);
+    return new Cookie(
+        key, value, StringUtils.join(key, "=", value), "wego.com", "./", 1, 2, true, true);
   }
 }
