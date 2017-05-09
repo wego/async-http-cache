@@ -18,21 +18,22 @@ public class CachedResponseServiceImpl implements CachedResponseService {
 
   @Inject private CachedResponseEntityToCachedResponse cachedResponseEntityToCachedResponse;
 
-  @Inject private CachedResponseToCachedResponseEntity responseToHttpReponseEntity;
+  @Inject private CachedResponseToCachedResponseEntity cachedResponseToCachedResponseEntity;
 
   @Override
-  public CachedResponse save(CachedResponse cachedResponse, long ttl) {
-    if (cachedResponse == null) {
-      return null;
+  public Optional<CachedResponse> save(CachedResponse cachedResponse, long ttl) {
+    CachedResponse savedCachedResponse = null;
+
+    if (cachedResponse != null) {
+      try {
+        cachedResponseDao.save(cachedResponseToCachedResponseEntity.transform(cachedResponse), ttl);
+        savedCachedResponse = cachedResponse;
+      } catch (IOException e) {
+        LOGGER.error("Error saving cachedResponse with id {}", cachedResponse.getId(), e);
+      }
     }
 
-    try {
-      cachedResponseDao.save(responseToHttpReponseEntity.transform(cachedResponse), ttl);
-    } catch (IOException e) {
-      LOGGER.error("Error saving cachedResponse with id {}", cachedResponse.getId(), e);
-    }
-
-    return cachedResponse;
+    return Optional.ofNullable(savedCachedResponse);
   }
 
   @Override
