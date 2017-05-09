@@ -6,6 +6,7 @@ import com.ning.http.client.cookie.Cookie;
 import org.apache.commons.lang3.StringUtils;
 
 public class RequestFixture {
+
   public static Request create(String method, String url) {
     return new RequestBuilder().setMethod(method).setUrl(url).build();
   }
@@ -27,6 +28,10 @@ public class RequestFixture {
     return new RequestBuilder().setMethod(method).setUrl(url).addParameter(key, value).build();
   }
 
+  public static Request createWithBody(String method, String url, String body) {
+    return new RequestBuilder().setMethod(method).setUrl(url).setBody(body).build();
+  }
+
   public static Request createWithFullParams() {
     return new RequestBuilder()
         .setMethod("GET")
@@ -35,6 +40,7 @@ public class RequestFixture {
         .addQueryParameter("queryParam", "test")
         .addParameter("param", "test")
         .addCookie(new Cookie("cookie", "test", "", "", "", 1, 2, true, true))
+        .setBody("test")
         .build();
   }
 }

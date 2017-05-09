@@ -17,9 +17,11 @@ import redis.clients.util.MurmurHash;
 
 public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
 
-  @Inject private CachedResponseService cachedResponseService;
+  @Inject
+  private CachedResponseService cachedResponseService;
 
-  @Inject private AsyncHttpClient asyncHttpClient;
+  @Inject
+  private AsyncHttpClient asyncHttpClient;
 
   private long ttl;
 
@@ -59,7 +61,7 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
     String requestStringId =
         StringUtils.join(
             request,
-            request.getBodyEncoding(),
+            request.getStringData(),
             Lists.newArrayList(request.getCookies()).toString());
     return String.valueOf(MurmurHash.hash64A(requestStringId.getBytes(), 0));
   }
