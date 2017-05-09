@@ -32,6 +32,12 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   @Override
   public Optional<ListenableFuture<Response>> executeRequest(
       Request request, AsyncCompletionHandlerBase handler) throws Exception {
+    return executeRequest(request, handler, ttl);
+  }
+
+  @Override
+  public Optional<ListenableFuture<Response>> executeRequest(
+      Request request, AsyncCompletionHandlerBase handler, long ttl) throws Exception {
 
     ListenableFuture<Response> responseListenableFuture = null;
     String responseId = buildResponseId(request);
@@ -42,7 +48,8 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
       handler.onCompleted(cachedResponse.get());
     } else {
       responseListenableFuture =
-          this.asyncHttpClient.executeRequest(request, buildCachingHandler(handler, responseId));
+          this.asyncHttpClient.executeRequest(
+              request, buildCachingHandler(handler, responseId, ttl));
     }
 
     return Optional.ofNullable(responseListenableFuture);
@@ -58,14 +65,14 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   }
 
   private AsyncCompletionHandlerBase buildCachingHandler(
-      final AsyncCompletionHandlerBase handler, final String responseId) {
+      final AsyncCompletionHandlerBase handler, final String responseId, final long cachingTtl) {
 
     return new AsyncCompletionHandlerBase() {
       @Override
       public Response onCompleted(Response response) throws Exception {
         CachedResponse cachedResponse =
             new CachedResponse.Builder(response).setId(responseId).build();
-        cachedResponseService.save(cachedResponse, ttl);
+        cachedResponseService.save(cachedResponse, cachingTtl);
 
         return handler.onCompleted(response);
       }

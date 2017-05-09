@@ -9,4 +9,7 @@ import java.util.Optional;
 public interface AsyncHttpCacheService {
   Optional<ListenableFuture<Response>> executeRequest(
       Request request, AsyncCompletionHandlerBase handler) throws Exception;
+
+  Optional<ListenableFuture<Response>> executeRequest(
+      Request request, AsyncCompletionHandlerBase handler, long ttl) throws Exception;
 }

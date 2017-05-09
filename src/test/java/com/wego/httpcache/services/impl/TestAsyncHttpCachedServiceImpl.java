@@ -113,6 +113,41 @@ public class TestAsyncHttpCachedServiceImpl {
   }
 
   @Test
+  public void executeRequest_withTtl_whenWasNotCached_executeHttpRequestAndCacheNewResponse()
+      throws Exception {
+    final Request request =
+        new RequestBuilder().setMethod("GET").setUrl("http://localhost:8089/resources/").build();
+    final List<CachedResponse> savedCachedResponses = Lists.newArrayList();
+    final long customTtl = 10;
+
+    stubFor(
+        get(urlEqualTo("/resources/"))
+            .willReturn(
+                aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "text/json")
+                    .withBody("This is body")));
+
+    when(cachedResponseService.findById(anyString())).thenReturn(Optional.empty());
+    when(cachedResponseService.save(any(), eq(customTtl)))
+        .thenAnswer(
+            invocation -> {
+              CachedResponse cr = invocation.getArgumentAt(0, CachedResponse.class);
+              savedCachedResponses.add(cr);
+              return Optional.of(cr);
+            });
+
+    Optional<ListenableFuture<Response>> responseListenableFuture =
+        asyncHttpCacheService.executeRequest(request, new AsyncCompletionHandlerBase(), customTtl);
+
+    responseListenableFuture.get().get();
+
+    verify(asyncHttpClient).executeRequest(any(), any());
+    assertThat(savedCachedResponses.size()).isEqualTo(1);
+    assertThat(savedCachedResponses.get(0).getId()).isNotEmpty();
+  }
+
+  @Test
   public void buildResponseId_returnsDifferentIdsForDifferentRequest() throws Exception {
 
     Request request = RequestFixture.create("GET", "http://localhost:8089/resources/");
