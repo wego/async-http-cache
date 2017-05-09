@@ -42,18 +42,23 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TestAsyncHttpCachedServiceImpl {
-  private static long CACHING_TTL = 60;
-  @Rule public WireMockRule wireMockRule = new WireMockRule(8089);
+public class TestAsyncHttpCacheServiceImpl {
 
-  @Spy private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+  private static long CACHING_TTL = 60;
+  @Rule
+  public WireMockRule wireMockRule = new WireMockRule(8089);
+
+  @Spy
+  private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
   @InjectMocks
   private AsyncHttpCacheService asyncHttpCacheService =
       new AsyncHttpCacheServiceImpl(asyncHttpClient, CACHING_TTL);
 
-  @Mock private CachedResponseService cachedResponseService;
-  @Mock private Request request;
+  @Mock
+  private CachedResponseService cachedResponseService;
+  @Mock
+  private Request request;
 
   @Test
   public void executeRequest_whenWasCached_getResponseFromCacheAndCallOnComplete()
@@ -155,11 +160,11 @@ public class TestAsyncHttpCachedServiceImpl {
     Request requestWithDifferentUrl =
         RequestFixture.create("GET", "http://localhost:8089/resources/2");
 
-    Request requestWithParams =
+    Request requestWithQueryParams =
         RequestFixture.createWithQueryParam(
             "GET", "http://localhost:8089/resources/2", "queryParam", "test1");
 
-    Request requestWithDifferentParams =
+    Request requestWithDifferentQueryParams =
         RequestFixture.createWithQueryParam(
             "GET", "http://localhost:8089/resources/2", "queryParam", "test2");
 
@@ -182,13 +187,21 @@ public class TestAsyncHttpCachedServiceImpl {
     Request requestWithDifferentMethod =
         RequestFixture.create("POST", "http://localhost:8089/resources/");
 
-    Request requestWithBody =
+    Request requestWithParams =
         RequestFixture.createWithParams(
             "POST", "http://localhost:8089/resources/", "param", "test1");
 
-    Request requestWithDifferentBody =
+    Request requestWithDifferentParams =
         RequestFixture.createWithParams(
             "POST", "http://localhost:8089/resources/", "param", "test2");
+
+    Request requestWithBody =
+        RequestFixture.createWithBody(
+            "POST", "http://localhost:8089/resources/", "test1");
+
+    Request requestWithDifferentBody =
+        RequestFixture.createWithBody(
+            "POST", "http://localhost:8089/resources/", "test2");
 
     Method method =
         AsyncHttpCacheServiceImpl.class.getDeclaredMethod("buildResponseId", Request.class);
@@ -196,17 +209,19 @@ public class TestAsyncHttpCachedServiceImpl {
 
     final List<String> responseIds =
         Stream.of(
-                request,
-                requestWithDifferentUrl,
-                requestWithDifferentMethod,
-                requestWithBody,
-                requestWithDifferentBody,
-                requestWithCookie,
-                requestWithDifferentCookie,
-                requestWithHeader,
-                requestWithDifferentHeader,
-                requestWithParams,
-                requestWithDifferentParams)
+            request,
+            requestWithDifferentUrl,
+            requestWithDifferentMethod,
+            requestWithParams,
+            requestWithDifferentParams,
+            requestWithCookie,
+            requestWithDifferentCookie,
+            requestWithHeader,
+            requestWithDifferentHeader,
+            requestWithQueryParams,
+            requestWithDifferentQueryParams,
+            requestWithBody,
+            requestWithDifferentBody)
             .map(
                 rq -> {
                   try {
@@ -219,7 +234,7 @@ public class TestAsyncHttpCachedServiceImpl {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-    assertThat(Sets.newHashSet(responseIds).size()).isEqualTo(11);
+    assertThat(Sets.newHashSet(responseIds).size()).isEqualTo(13);
   }
 
   @Test
