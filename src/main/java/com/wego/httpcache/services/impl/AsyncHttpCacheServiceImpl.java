@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.ning.http.client.AsyncCompletionHandlerBase;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.wego.httpcache.dao.models.CachedResponse;
@@ -29,7 +30,10 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   }
 
   @Override
-  public void executeRequest(Request request, AsyncCompletionHandlerBase handler) throws Exception {
+  public Optional<ListenableFuture<Response>> executeRequest(
+      Request request, AsyncCompletionHandlerBase handler) throws Exception {
+
+    ListenableFuture<Response> responseListenableFuture = null;
     String responseId = buildResponseId(request);
 
     Optional<CachedResponse> cachedResponse = cachedResponseService.findById(responseId);
@@ -37,8 +41,11 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
     if (cachedResponse.isPresent()) {
       handler.onCompleted(cachedResponse.get());
     } else {
-      this.asyncHttpClient.executeRequest(request, buildCachingHandler(handler, responseId));
+      responseListenableFuture =
+          this.asyncHttpClient.executeRequest(request, buildCachingHandler(handler, responseId));
     }
+
+    return Optional.ofNullable(responseListenableFuture);
   }
 
   private String buildResponseId(Request request) {
@@ -52,6 +59,7 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
 
   private AsyncCompletionHandlerBase buildCachingHandler(
       final AsyncCompletionHandlerBase handler, final String responseId) {
+
     return new AsyncCompletionHandlerBase() {
       @Override
       public Response onCompleted(Response response) throws Exception {
