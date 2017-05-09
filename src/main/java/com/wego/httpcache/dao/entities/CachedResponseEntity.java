@@ -1,19 +1,18 @@
 package com.wego.httpcache.dao.entities;
 
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
-import com.ning.http.client.cookie.Cookie;
 import java.util.List;
 
 public class CachedResponseEntity {
 
   private String id;
-  private List<Cookie> cookies;
+  private List<CookieEntity> cookies;
   private String responseBody;
   private FluentCaseInsensitiveStringsMap headers;
   private Integer statusCode;
   private String statusText;
 
-  public List<Cookie> getCookies() {
+  public List<CookieEntity> getCookies() {
     return cookies;
   }
 
@@ -40,7 +39,7 @@ public class CachedResponseEntity {
   public static final class Builder {
 
     private String id;
-    private List<Cookie> cookies;
+    private List<CookieEntity> cookies;
     private String responseBody;
     private FluentCaseInsensitiveStringsMap headers;
     private Integer statusCode;
@@ -53,7 +52,7 @@ public class CachedResponseEntity {
       return this;
     }
 
-    public Builder setCookies(List<Cookie> cookies) {
+    public Builder setCookies(List<CookieEntity> cookies) {
       this.cookies = cookies;
       return this;
     }

@@ -9,7 +9,7 @@ public class CachedResponseFixture {
         .setId("ID")
         .setResponseBody("Body")
         .setStatusCode(200)
-        .setStatusText("")
+        .setStatusText("Ok")
         .setHeaders(HeaderFixture.create())
         .setCookies(Arrays.asList(CookieFixture.create()))
         .build();
