@@ -1,9 +1,5 @@
 package com.wego.httpcache.dao.impl.guava;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.wego.httpcache.dao.CachedResponseDao;
@@ -13,25 +9,13 @@ import java.util.concurrent.TimeUnit;
 
 public class GuavaCachedResponseImpl implements CachedResponseDao {
   private static final long CACHE_TTL = 30;
-  private static final Cache<String, String> CACHE =
+  private static final Cache<String, CachedResponseEntity> CACHE =
       CacheBuilder.newBuilder().expireAfterWrite(CACHE_TTL, TimeUnit.MINUTES).build();
-
-  private static final ObjectMapper OBJECT_MAPPER =
-      new ObjectMapper()
-          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-          .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
   @Override
   public CachedResponseEntity save(CachedResponseEntity cachedResponseEntity, long ttl) {
-    String jsonEntity = null;
-    try {
-      jsonEntity = OBJECT_MAPPER.writeValueAsString(cachedResponseEntity);
-    } catch (JsonProcessingException ex) {
-      ex.printStackTrace();
-    }
-
-    if (jsonEntity != null) {
-      CACHE.put(cachedResponseEntity.getId(), jsonEntity);
+    if (cachedResponseEntity != null) {
+      CACHE.put(cachedResponseEntity.getId(), cachedResponseEntity);
     }
 
     return cachedResponseEntity;
@@ -39,17 +23,6 @@ public class GuavaCachedResponseImpl implements CachedResponseDao {
 
   @Override
   public Optional<CachedResponseEntity> findById(String id) {
-    CachedResponseEntity cachedResponseEntity = null;
-    String jsonEntity = CACHE.getIfPresent(id);
-
-    if (jsonEntity != null) {
-      try {
-        cachedResponseEntity = OBJECT_MAPPER.readValue(jsonEntity, CachedResponseEntity.class);
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-
-    return Optional.ofNullable(cachedResponseEntity);
+    return Optional.ofNullable(CACHE.getIfPresent(id));
   }
 }
