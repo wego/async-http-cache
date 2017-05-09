@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ning.http.client.AsyncCompletionHandlerBase;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
@@ -65,13 +66,16 @@ public class TestAsyncHttpCachedServiceImpl {
 
           @Override
           public Response onCompleted(Response response) throws Exception {
-            verifyZeroInteractions(asyncHttpClient);
             assertThat(response).isEqualTo(cachedResponse);
             return response;
           }
         };
 
-    asyncHttpCacheService.executeRequest(request, asyncCompletionHandlerBaseHandler);
+    Optional<ListenableFuture<Response>> responseListenableFuture =
+        asyncHttpCacheService.executeRequest(request, asyncCompletionHandlerBaseHandler);
+
+    verifyZeroInteractions(asyncHttpClient);
+    assertThat(responseListenableFuture.isPresent()).isFalse();
   }
 
   @Test
@@ -92,21 +96,20 @@ public class TestAsyncHttpCachedServiceImpl {
     when(cachedResponseService.findById(anyString())).thenReturn(Optional.empty());
     when(cachedResponseService.save(any(), eq(CACHING_TTL)))
         .thenAnswer(
-            invocation ->
-                savedCachedResponses.add(invocation.getArgumentAt(0, CachedResponse.class)));
+            invocation -> {
+              CachedResponse cr = invocation.getArgumentAt(0, CachedResponse.class);
+              savedCachedResponses.add(cr);
+              return Optional.of(cr);
+            });
 
-    AsyncCompletionHandlerBase asyncCompletionHandlerBaseHandler =
-        new AsyncCompletionHandlerBase() {
+    Optional<ListenableFuture<Response>> responseListenableFuture =
+        asyncHttpCacheService.executeRequest(request, new AsyncCompletionHandlerBase());
 
-          @Override
-          public Response onCompleted(Response response) throws Exception {
-            verify(asyncHttpClient).executeRequest(any(), any());
-            assertThat(savedCachedResponses.size()).isEqualTo(1);
-            return response;
-          }
-        };
+    responseListenableFuture.get().get();
 
-    asyncHttpCacheService.executeRequest(request, asyncCompletionHandlerBaseHandler);
+    verify(asyncHttpClient).executeRequest(any(), any());
+    assertThat(savedCachedResponses.size()).isEqualTo(1);
+    assertThat(savedCachedResponses.get(0).getId()).isNotEmpty();
   }
 
   @Test
