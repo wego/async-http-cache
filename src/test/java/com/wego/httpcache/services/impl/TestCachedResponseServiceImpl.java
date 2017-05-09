@@ -39,7 +39,7 @@ public class TestCachedResponseServiceImpl {
 
   @Test
   public void save_whenInputObjectIsNull_returnNull() {
-    Assertions.assertThat(cachedResponseService.save(null, CACHING_TTL)).isNull();
+    Assertions.assertThat(cachedResponseService.save(null, CACHING_TTL).isPresent()).isFalse();
   }
 
   @Test
@@ -57,7 +57,7 @@ public class TestCachedResponseServiceImpl {
               return cachedResponseEntity;
             });
 
-    Assertions.assertThat(cachedResponseService.save(cachedResponse, CACHING_TTL))
+    Assertions.assertThat(cachedResponseService.save(cachedResponse, CACHING_TTL).get())
         .isEqualTo(cachedResponse);
     assertThat(savedCachedResponses.size()).isEqualTo(1);
   }
