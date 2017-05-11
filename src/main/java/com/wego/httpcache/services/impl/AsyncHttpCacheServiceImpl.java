@@ -20,7 +20,6 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   @Inject
   private CachedResponseService cachedResponseService;
 
-  @Inject
   private AsyncHttpClient asyncHttpClient;
 
   private long ttl;
