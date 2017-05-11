@@ -17,15 +17,16 @@ import redis.clients.util.MurmurHash;
 
 public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
 
-  @Inject
-  private CachedResponseService cachedResponseService;
-
+  private static final String DELIMITER = ":";
+  @Inject private CachedResponseService cachedResponseService;
+  private String serviceName;
   private AsyncHttpClient asyncHttpClient;
-
   private long ttl;
 
   @Inject
-  public AsyncHttpCacheServiceImpl(@Assisted AsyncHttpClient asyncHttpClient, @Assisted long ttl) {
+  public AsyncHttpCacheServiceImpl(
+      @Assisted String serviceName, @Assisted AsyncHttpClient asyncHttpClient, @Assisted long ttl) {
+    this.serviceName = serviceName;
     this.asyncHttpClient = asyncHttpClient;
     this.ttl = ttl;
   }
@@ -59,10 +60,9 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   private String buildResponseId(Request request) {
     String requestStringId =
         StringUtils.join(
-            request,
-            request.getStringData(),
-            Lists.newArrayList(request.getCookies()).toString());
-    return String.valueOf(MurmurHash.hash64A(requestStringId.getBytes(), 0));
+            request, request.getStringData(), Lists.newArrayList(request.getCookies()).toString());
+    return StringUtils.joinWith(
+        DELIMITER, serviceName, String.valueOf(MurmurHash.hash64A(requestStringId.getBytes(), 0)));
   }
 
   private AsyncCompletionHandlerBase buildCachingHandler(

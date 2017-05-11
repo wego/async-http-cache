@@ -44,6 +44,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TestAsyncHttpCacheServiceImpl {
 
+  private final static String SERVICE_NAME = "Service Name";
+
   private static long CACHING_TTL = 60;
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(8089);
@@ -53,7 +55,7 @@ public class TestAsyncHttpCacheServiceImpl {
 
   @InjectMocks
   private AsyncHttpCacheService asyncHttpCacheService =
-      new AsyncHttpCacheServiceImpl(asyncHttpClient, CACHING_TTL);
+      new AsyncHttpCacheServiceImpl(SERVICE_NAME, asyncHttpClient, CACHING_TTL);
 
   @Mock
   private CachedResponseService cachedResponseService;
@@ -235,6 +237,7 @@ public class TestAsyncHttpCacheServiceImpl {
             .collect(Collectors.toList());
 
     assertThat(Sets.newHashSet(responseIds).size()).isEqualTo(13);
+    assertThat(responseIds.get(0)).startsWith(SERVICE_NAME);
   }
 
   @Test
