@@ -22,7 +22,7 @@ public class SampleApp {
         injector.getInstance(AsyncHttpCacheServiceFactory.class);
 
     AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-    return asyncHttpCacheServiceFactory.create(asyncHttpClient, 10000);
+    return asyncHttpCacheServiceFactory.create("SampleApp", asyncHttpClient, 10000);
   }
 
   public static void main(String[] args) throws Exception {
