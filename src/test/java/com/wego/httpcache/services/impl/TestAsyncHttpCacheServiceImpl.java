@@ -44,7 +44,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TestAsyncHttpCacheServiceImpl {
 
-  private final static String SERVICE_NAME = "Service Name";
+  private static final String SERVICE_NAME = "Service Name";
 
   private static long CACHING_TTL = 60;
   @Rule
