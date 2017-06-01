@@ -34,24 +34,33 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   @Override
   public Optional<ListenableFuture<Response>> executeRequest(
       Request request, AsyncCompletionHandlerBase handler) throws Exception {
-    return executeRequest(request, handler, ttl);
+    return executeRequest(request, handler, this.ttl);
   }
 
   @Override
   public Optional<ListenableFuture<Response>> executeRequest(
       Request request, AsyncCompletionHandlerBase handler, long ttl) throws Exception {
+    return executeRequest(request, handler, ttl, null);
+  }
+
+  @Override
+  public Optional<ListenableFuture<Response>> executeRequest(
+      Request request, AsyncCompletionHandlerBase handler, long ttl, String cacheKey)
+      throws Exception {
 
     ListenableFuture<Response> responseListenableFuture = null;
-    String responseId = buildResponseId(request);
+    if (cacheKey == null) {
+      cacheKey = buildResponseId(request);
+    }
 
-    Optional<CachedResponse> cachedResponse = cachedResponseService.findById(responseId);
+    Optional<CachedResponse> cachedResponse = cachedResponseService.findById(cacheKey);
 
     if (cachedResponse.isPresent()) {
       handler.onCompleted(cachedResponse.get());
     } else {
       responseListenableFuture =
           this.asyncHttpClient.executeRequest(
-              request, buildCachingHandler(handler, responseId, ttl));
+              request, buildCachingHandler(handler, cacheKey, ttl));
     }
 
     return Optional.ofNullable(responseListenableFuture);

@@ -47,20 +47,16 @@ public class TestAsyncHttpCacheServiceImpl {
   private static final String SERVICE_NAME = "Service Name";
 
   private static long CACHING_TTL = 60;
-  @Rule
-  public WireMockRule wireMockRule = new WireMockRule(8089);
+  @Rule public WireMockRule wireMockRule = new WireMockRule(8089);
 
-  @Spy
-  private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+  @Spy private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
   @InjectMocks
   private AsyncHttpCacheService asyncHttpCacheService =
       new AsyncHttpCacheServiceImpl(SERVICE_NAME, asyncHttpClient, CACHING_TTL);
 
-  @Mock
-  private CachedResponseService cachedResponseService;
-  @Mock
-  private Request request;
+  @Mock private CachedResponseService cachedResponseService;
+  @Mock private Request request;
 
   @Test
   public void executeRequest_whenWasCached_getResponseFromCacheAndCallOnComplete()
@@ -155,6 +151,44 @@ public class TestAsyncHttpCacheServiceImpl {
   }
 
   @Test
+  public void
+      executeRequest_withTtlAndCacheKey_whenWasNotCached_executeHttpRequestAndCacheNewResponse()
+          throws Exception {
+    final Request request =
+        new RequestBuilder().setMethod("GET").setUrl("http://localhost:8089/resources/").build();
+    final List<CachedResponse> savedCachedResponses = Lists.newArrayList();
+    final long customTtl = 10;
+
+    stubFor(
+        get(urlEqualTo("/resources/"))
+            .willReturn(
+                aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "text/json")
+                    .withBody("This is body")));
+
+    when(cachedResponseService.findById(anyString())).thenReturn(Optional.empty());
+    when(cachedResponseService.save(any(), eq(customTtl)))
+        .thenAnswer(
+            invocation -> {
+              CachedResponse cr = invocation.getArgumentAt(0, CachedResponse.class);
+              savedCachedResponses.add(cr);
+              return Optional.of(cr);
+            });
+
+    Optional<ListenableFuture<Response>> responseListenableFuture =
+        asyncHttpCacheService.executeRequest(
+            request, new AsyncCompletionHandlerBase(), customTtl, "test");
+
+    responseListenableFuture.get().get();
+
+    verify(asyncHttpClient).executeRequest(any(), any());
+    assertThat(savedCachedResponses.size()).isEqualTo(1);
+    assertThat(savedCachedResponses.get(0).getId()).isEqualTo("test");
+    assertThat(savedCachedResponses.get(0).getId()).isNotEmpty();
+  }
+
+  @Test
   public void buildResponseId_returnsDifferentIdsForDifferentRequest() throws Exception {
 
     Request request = RequestFixture.create("GET", "http://localhost:8089/resources/");
@@ -198,12 +232,10 @@ public class TestAsyncHttpCacheServiceImpl {
             "POST", "http://localhost:8089/resources/", "param", "test2");
 
     Request requestWithBody =
-        RequestFixture.createWithBody(
-            "POST", "http://localhost:8089/resources/", "test1");
+        RequestFixture.createWithBody("POST", "http://localhost:8089/resources/", "test1");
 
     Request requestWithDifferentBody =
-        RequestFixture.createWithBody(
-            "POST", "http://localhost:8089/resources/", "test2");
+        RequestFixture.createWithBody("POST", "http://localhost:8089/resources/", "test2");
 
     Method method =
         AsyncHttpCacheServiceImpl.class.getDeclaredMethod("buildResponseId", Request.class);
@@ -211,19 +243,19 @@ public class TestAsyncHttpCacheServiceImpl {
 
     final List<String> responseIds =
         Stream.of(
-            request,
-            requestWithDifferentUrl,
-            requestWithDifferentMethod,
-            requestWithParams,
-            requestWithDifferentParams,
-            requestWithCookie,
-            requestWithDifferentCookie,
-            requestWithHeader,
-            requestWithDifferentHeader,
-            requestWithQueryParams,
-            requestWithDifferentQueryParams,
-            requestWithBody,
-            requestWithDifferentBody)
+                request,
+                requestWithDifferentUrl,
+                requestWithDifferentMethod,
+                requestWithParams,
+                requestWithDifferentParams,
+                requestWithCookie,
+                requestWithDifferentCookie,
+                requestWithHeader,
+                requestWithDifferentHeader,
+                requestWithQueryParams,
+                requestWithDifferentQueryParams,
+                requestWithBody,
+                requestWithDifferentBody)
             .map(
                 rq -> {
                   try {
