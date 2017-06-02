@@ -13,10 +13,12 @@ import com.wego.httpcache.services.AsyncHttpCacheService;
 import com.wego.httpcache.services.CachedResponseService;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.util.MurmurHash;
 
 public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHttpCacheServiceImpl.class);
   private static final String DELIMITER = ":";
   @Inject private CachedResponseService cachedResponseService;
   private String serviceName;
@@ -49,13 +51,17 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
       throws Exception {
 
     ListenableFuture<Response> responseListenableFuture = null;
+
     if (cacheKey == null) {
       cacheKey = buildResponseId(request);
     }
 
     Optional<CachedResponse> cachedResponse = cachedResponseService.findById(cacheKey);
 
+    LOGGER.info("HTTP cache Provider: {} has ResponseID: {}", serviceName, cacheKey);
+
     if (cachedResponse.isPresent()) {
+      LOGGER.info("Found HTTP cache for Provider: {} with ResponseID: {}", serviceName, cacheKey);
       handler.onCompleted(cachedResponse.get());
     } else {
       responseListenableFuture =
@@ -70,6 +76,7 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
     String requestStringId =
         StringUtils.join(
             request, request.getStringData(), Lists.newArrayList(request.getCookies()).toString());
+
     return StringUtils.joinWith(
         DELIMITER, serviceName, String.valueOf(MurmurHash.hash64A(requestStringId.getBytes(), 0)));
   }
@@ -82,6 +89,7 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
       public Response onCompleted(Response response) throws Exception {
         CachedResponse cachedResponse =
             new CachedResponse.Builder(response).setId(responseId).build();
+        LOGGER.info("Save HTTP cache for provider {} with ResponseID {}", serviceName, responseId);
         cachedResponseService.save(cachedResponse, cachingTtl);
 
         return handler.onCompleted(response);
