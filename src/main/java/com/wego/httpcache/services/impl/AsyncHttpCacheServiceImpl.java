@@ -1,5 +1,7 @@
 package com.wego.httpcache.services.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -11,17 +13,24 @@ import com.ning.http.client.Response;
 import com.wego.httpcache.dao.models.CachedResponse;
 import com.wego.httpcache.services.AsyncHttpCacheService;
 import com.wego.httpcache.services.CachedResponseService;
+
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.StringUtils;
+
 import redis.clients.util.MurmurHash;
 
 public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
-
   private static final String DELIMITER = ":";
   @Inject private CachedResponseService cachedResponseService;
   private String serviceName;
   private AsyncHttpClient asyncHttpClient;
   private long ttl;
+
+  private final Cache<String, ListenableFuture<Response>> cache = CacheBuilder.newBuilder()
+      .expireAfterWrite(2, TimeUnit.MINUTES)
+      .build();
 
   @Inject
   public AsyncHttpCacheServiceImpl(
@@ -49,9 +58,11 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
     if (cachedResponse.isPresent()) {
       handler.onCompleted(cachedResponse.get());
     } else {
-      responseListenableFuture =
-          this.asyncHttpClient.executeRequest(
-              request, buildCachingHandler(handler, responseId, ttl));
+      responseListenableFuture = cache.get(responseId, () -> {
+        return this.asyncHttpClient.executeRequest(request,
+            buildCachingHandler(handler, responseId, ttl));
+      });
+      handler.onCompleted(responseListenableFuture.get());
     }
 
     return Optional.ofNullable(responseListenableFuture);
@@ -60,7 +71,8 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
   private String buildResponseId(Request request) {
     String requestStringId =
         StringUtils.join(
-            request, request.getStringData(), Lists.newArrayList(request.getCookies()).toString());
+            request, request.getStringData(), Lists.newArrayList(request.getCookies())
+                .toString());
     return StringUtils.joinWith(
         DELIMITER, serviceName, String.valueOf(MurmurHash.hash64A(requestStringId.getBytes(), 0)));
   }
@@ -72,10 +84,11 @@ public class AsyncHttpCacheServiceImpl implements AsyncHttpCacheService {
       @Override
       public Response onCompleted(Response response) throws Exception {
         CachedResponse cachedResponse =
-            new CachedResponse.Builder(response).setId(responseId).build();
+            new CachedResponse.Builder(response).setId(responseId)
+                .build();
         cachedResponseService.save(cachedResponse, cachingTtl);
 
-        return handler.onCompleted(response);
+        return response;
       }
 
       @Override
